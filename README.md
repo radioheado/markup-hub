@@ -1,7 +1,6 @@
 ﻿# markup-hub
 
-`markup-hub` is a lightweight collaboration layer for long-form Markdown projects. It renders manifest-driven chapter files into a single local HTML review surface, lets reviewers leave inline comments or edit suggestions, and writes those review
-traces back into the source files when you are ready to process them.
+`markup-hub` is a lightweight collaboration layer for long-form Markdown projects. It renders manifest-driven chapter files into a single local HTML review surface, lets reviewers leave inline comments or edit suggestions, and writes those review traces back into the source files when you are ready to process them.
 
 No server. No login. No database setup. Just Markdown, a browser, and a folder layout your team already understands.
 
