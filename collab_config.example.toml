@@ -1,0 +1,30 @@
+# Copy this file to collab_config.toml and adjust the values for your workspace.
+# All paths are relative to the markup-hub/ directory.
+
+project = "Research Workspace"
+subtitle = "Spring 2026"
+
+# These names appear in the viewer identity picker.
+reviewers = ["Reviewer One", "Reviewer Two"]
+
+# Recommended layout:
+# workspace/
+# |- collab_viewer.html
+# |- markup-hub/
+# |- paper-a/
+# `- proposal-b/
+#
+# Your document folders do not need to live inside markup-hub/.
+# They can sit beside it or anywhere else on disk, as long as the relative
+# paths below point to their main.md manifest files.
+
+[groups."Paper A"]
+main = "../paper-a/main.md"
+
+[groups."Proposal B"]
+main = "../proposal-b/main.md"
+
+# Optional label overrides. Keys should match the markdown file paths as seen
+# from markup-hub/ after resolving INCLUDE directives from each main.md file.
+[labels]
+"../paper-a/src/related_work.md" = "Related Work"

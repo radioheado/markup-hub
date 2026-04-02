@@ -1,0 +1,16 @@
+# Local workspace configuration
+collab_config.toml
+reviews.json
+
+# Generated viewer outputs
+collab_viewer.html
+collab_viewer_preview.html
+collab_viewer_local.html
+
+# Python cache artifacts
+__pycache__/
+*.py[cod]
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

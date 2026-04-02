@@ -1,0 +1,641 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>markup-hub</title>
+  <style>
+    :root {
+      --color-background-primary: #fdfcf8;
+      --color-background-secondary: #f4f0e7;
+      --color-background-info: #e7f1fb;
+      --color-background-warning: #fff3e0;
+      --color-background-success: #e7f4ee;
+      --color-text-primary: #2f241d;
+      --color-text-secondary: #5b4b40;
+      --color-text-tertiary: #8c786b;
+      --color-text-info: #174f88;
+      --color-text-warning: #7a4f0a;
+      --color-border-secondary: #d7cdc1;
+      --color-border-tertiary: #e5ddd2;
+      --border-radius-md: 8px;
+      --border-radius-lg: 14px;
+      --font-serif: Georgia, "Times New Roman", serif;
+      --font-sans: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      --font-mono: "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--color-background-primary); color: var(--color-text-primary); font-family: var(--font-sans); }
+    button, textarea, input { font: inherit; }
+    .identity-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; background: var(--color-background-secondary); }
+    .identity-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+    .identity-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .identity-card { width: 160px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); font-size: 15px; font-weight: 500; cursor: pointer; color: var(--color-text-primary); transition: border 0.15s, background 0.15s, color 0.15s; }
+    .identity-card:hover { border: 2px solid #378ADD; background: var(--color-background-info); color: var(--color-text-info); }
+    .app-shell { display: none; }
+    .sidebar { position: fixed; left: 0; top: 0; width: 270px; height: 100vh; background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-header { padding: 16px 14px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .sidebar-project { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+    .sidebar-subtitle { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+    .reviewer-badge { margin: 10px 10px 4px; padding: 8px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); font-size: 12px; font-weight: 500; color: var(--color-text-info); }
+    .reviewer-switch { font-size: 11px; color: var(--color-text-tertiary); margin-left: 6px; cursor: pointer; text-decoration: underline; font-weight: 400; }
+    .outline-panel { flex: 1; overflow-y: auto; padding: 8px 0 12px; scrollbar-width: thin; }
+    .doc-switcher { border-top: 0.5px solid var(--color-border-tertiary); max-height: 220px; overflow-y: auto; flex-shrink: 0; padding: 8px 0 12px; }
+    .group-label { font-size: 9px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--color-text-tertiary); padding: 10px 14px 4px; }
+    .nav-item { padding: 7px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; border-left: 2px solid transparent; }
+    .nav-item.active { background: var(--color-background-info); border-left-color: #378ADD; }
+    .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--color-border-tertiary); flex-shrink: 0; }
+    .nav-item.active .nav-dot { background: #378ADD; }
+    .nav-label { font-size: 12px; color: var(--color-text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-item.active .nav-label { color: var(--color-text-info); font-weight: 500; }
+    .nav-badge { font-size: 9px; background: #BA7517; color: #fff; border-radius: 8px; padding: 1px 5px; font-weight: 600; display: none; }
+    .jump-header { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--color-text-tertiary); padding: 4px 14px 8px; }
+    .jump-item { cursor: pointer; line-height: 1.45; }
+    .jump-item:hover { color: var(--color-text-primary); }
+    .jump-h1 { font-size: 12px; padding: 4px 14px; color: var(--color-text-secondary); }
+    .jump-h2 { font-size: 11px; padding: 4px 22px; color: var(--color-text-tertiary); }
+    .jump-h3 { font-size: 10.5px; padding: 4px 30px; color: var(--color-text-tertiary); }
+    .doc-label { font-size: 12px; color: var(--color-text-secondary); padding: 6px 14px; cursor: pointer; border-left: 2px solid transparent; }
+    .doc-label:hover { color: var(--color-text-primary); }
+    .doc-label.active { color: var(--color-text-info); background: var(--color-background-info); border-left-color: #378ADD; font-weight: 500; }
+    .toolbar { position: fixed; top: 0; left: 270px; right: 0; height: 44px; z-index: 100; background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 20px; gap: 10px; }
+    .toolbar-filename { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-tertiary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .annotation-pill { font-size: 11px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 20px; padding: 3px 10px; color: var(--color-text-secondary); white-space: nowrap; }
+    .toolbar button, .toolbar .fallback-button { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 11px; font-weight: 500; padding: 5px 12px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-secondary); white-space: nowrap; }
+    .toolbar button:disabled { opacity: 0.7; cursor: wait; }
+    .firefox-notice { position: fixed; top: 44px; left: 270px; right: 0; height: 28px; background: var(--color-background-warning); font-size: 11px; padding: 0 20px; display: none; align-items: center; color: var(--color-text-warning); z-index: 90; }
+    .content-area { margin-left: 270px; padding-top: 44px; padding-bottom: 26px; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+    .content-inner { max-width: 920px; margin: 0 auto; padding: 40px 48px 120px; }
+    .empty-state { padding: 48px 0; color: var(--color-text-secondary); font-size: 14px; line-height: 1.7; }
+    .status-bar { position: fixed; bottom: 0; left: 270px; right: 0; height: 26px; background: var(--color-background-secondary); border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 16px; gap: 16px; font-size: 10px; color: var(--color-text-tertiary); }
+    .status-left { display: flex; align-items: center; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 5px; background: #BA7517; }
+    .status-right { margin-left: auto; }
+    .popup { position: fixed; z-index: 1000; display: none; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 4px; gap: 2px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+    .popup button { font-size: 11px; font-weight: 500; padding: 5px 10px; border-radius: var(--border-radius-md); border: none; background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+    .popup button:hover { background: var(--color-background-secondary); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.25); z-index: 500; display: none; align-items: center; justify-content: center; }
+    .modal-box { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 24px; width: 460px; max-width: calc(100vw - 48px); position: relative; }
+    .modal-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 10px; }
+    .modal-quote { font-style: italic; font-family: var(--font-serif); font-size: 13px; border-left: 2px solid #BA7517; padding-left: 10px; margin: 0 0 12px; color: var(--color-text-secondary); line-height: 1.5; white-space: pre-wrap; }
+    .modal-textarea { width: 100%; min-height: 80px; font-size: 14px; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 8px 10px; resize: vertical; outline: none; box-sizing: border-box; background: var(--color-background-primary); color: var(--color-text-primary); }
+    .modal-textarea:focus { border-color: #378ADD; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+    .modal-actions button { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 11px; font-weight: 500; padding: 5px 12px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-secondary); }
+    .modal-actions .primary { background: var(--color-background-info); color: var(--color-text-info); border-color: #378ADD; }
+    .md-body { font-family: var(--font-serif); font-size: calc(15px * var(--font-scale, 1)); line-height: 1.75; color: var(--color-text-primary); }
+    .md-body h1 { font-family: var(--font-sans); font-size: 22px; font-weight: 500; margin: 0 0 12px; }
+    .md-body h2 { font-family: var(--font-sans); font-size: 16px; font-weight: 500; border-top: 0.5px solid var(--color-border-tertiary); padding-top: 10px; margin: 24px 0 10px; }
+    .md-body h3 { font-family: var(--font-sans); font-size: 14px; font-weight: 500; margin: 18px 0 8px; }
+    .md-body p { margin-bottom: 1em; }
+    .md-body strong { font-weight: 500; }
+    .md-body em { font-style: italic; }
+    .md-body a { color: var(--color-text-info); }
+    .md-body code { font-family: var(--font-mono); font-size: 13px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 3px; padding: 1px 5px; }
+    .md-body pre { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 16px 20px; overflow-x: auto; margin: 16px 0; }
+    .md-body pre code { background: none; border: none; padding: 0; font-size: 13px; }
+    .md-body blockquote { border-left: 2px solid var(--color-border-secondary); padding-left: 16px; color: var(--color-text-secondary); font-style: italic; margin: 16px 0; }
+    .md-body hr { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 28px 0; }
+    .md-body ul, .md-body ol { padding-left: 1.5em; margin-bottom: 1em; }
+    .md-body li { margin-bottom: 0.25em; }
+    .table-wrap { width: 100%; overflow-x: auto; margin: 20px 0; }
+    .md-body table { width: 100%; min-width: 100%; border-collapse: collapse; font-size: 13px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden; }
+    .md-body thead { background: var(--color-background-secondary); }
+    .md-body th { padding: 8px 12px; text-align: left; font-weight: 500; font-size: 12px; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); white-space: nowrap; }
+    .md-body td { padding: 7px 12px; vertical-align: top; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .md-body tbody tr:nth-child(even) { background: var(--color-background-secondary); }
+    .hl-comment { background: rgba(186,117,23,0.18); border-radius: 2px; padding: 0 1px; }
+    .hl-edit { background: rgba(15,110,86,0.12); border-radius: 2px; padding: 0 1px; }
+    .ann-thread { margin: 6px 0 12px; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; position: relative; }
+    .comment-thread { border-left: 2px solid #BA7517; background: var(--color-background-warning); }
+    .edit-thread { border-left: 2px solid #0F6E56; background: var(--color-background-success); }
+    .thread-meta { display: flex; align-items: center; gap: 8px; padding: 8px 12px 4px; font-size: 11px; }
+    .thread-author { font-weight: 500; color: var(--color-text-primary); }
+    .thread-badge { font-size: 9px; color: #fff; border-radius: 8px; padding: 1px 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-comment { background: #BA7517; }
+    .badge-edit { background: #0F6E56; }
+    .thread-time { color: var(--color-text-tertiary); flex: 1; }
+    .thread-delete { position: absolute; top: 6px; right: 8px; font-size: 16px; line-height: 1; border: none; background: none; color: var(--color-text-tertiary); cursor: pointer; opacity: 0.4; padding: 0; }
+    .thread-delete:hover { opacity: 1; color: #E24B4A; }
+    .thread-body { padding: 0 12px 10px; font-size: 13px; line-height: 1.5; color: var(--color-text-primary); white-space: pre-wrap; }
+    .thread-section { padding: 0 12px 8px; }
+    .thread-label { font-size: 10px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; font-family: var(--font-mono); }
+    .thread-code { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); background: var(--color-background-primary); border-radius: 4px; padding: 4px 8px; white-space: pre-wrap; word-break: break-word; }
+    @media (max-width: 900px) {
+      .sidebar { position: static; width: 100%; height: auto; border-right: none; border-bottom: 0.5px solid var(--color-border-tertiary); }
+      .toolbar, .firefox-notice, .status-bar { left: 0; }
+      .toolbar { top: auto; position: sticky; flex-wrap: wrap; height: auto; min-height: 44px; padding: 8px 12px; }
+      .firefox-notice { top: auto; position: sticky; }
+      .content-area { margin-left: 0; height: auto; min-height: calc(100vh - 70px); }
+      .content-inner { padding: 24px 20px 96px; }
+      .status-bar { position: sticky; bottom: 0; flex-wrap: wrap; gap: 10px; height: auto; min-height: 26px; padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="identityOverlay" class="identity-overlay">
+    <div class="identity-title">Who are you?</div>
+    <div id="identityCards" class="identity-cards"></div>
+  </div>
+  <div id="appShell" class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div id="projectTitle" class="sidebar-project"></div><div id="projectSubtitle" class="sidebar-subtitle"></div></div>
+      <div class="reviewer-badge"><span id="reviewerName"></span><span id="switchReviewer" class="reviewer-switch">Not you?</span></div>
+      <div class="jump-header">Current doc</div>
+      <div id="jumpItems" class="outline-panel"></div>
+      <div class="doc-switcher"><div class="jump-header">Docs in this group</div><div id="navTree"></div></div>
+    </aside>
+    <div class="toolbar"><div id="filenameBar" class="toolbar-filename">No file selected</div><div id="annotationPill" class="annotation-pill">0 annotations</div><button id="fontDownBtn" type="button" title="Decrease font size">A-</button><button id="fontResetBtn" type="button" title="Reset font size">A</button><button id="fontUpBtn" type="button" title="Increase font size">A+</button><div id="saveControls"><button id="saveBtn" type="button">Save</button></div></div>
+    <div id="firefoxNotice" class="firefox-notice"></div>
+    <main id="contentArea" class="content-area"><div class="content-inner"><div id="content" class="md-body"></div></div></main>
+    <div class="status-bar"><div class="status-left"><span id="statusDot" class="status-dot"></span><span id="statusText">Unsaved changes</span></div><div id="statusReviewer">Reviewer: Unknown</div><div id="statusSummary" class="status-right">0 annotations - 0 files</div></div>
+  </div>
+  <div id="selectionPopup" class="popup"><button id="popupCommentBtn" type="button">Comment</button><button id="popupEditBtn" type="button">Suggest edit</button></div>
+  <div id="modalOverlay" class="modal-overlay"><div class="modal-box" role="dialog" aria-modal="true"><div id="modalTitle" class="modal-title"></div><div id="modalQuote" class="modal-quote"></div><textarea id="modalTextarea" class="modal-textarea"></textarea><div class="modal-actions"><button id="modalCancelBtn" type="button">Cancel</button><button id="modalSubmitBtn" class="primary" type="button"></button></div></div></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    const DOCS_DATA = __DOCS_DATA__;
+    const STORAGE_KEY = 'markuphub_reviewer';
+    const DB_NAME = 'markuphub-db';
+    const DB_VERSION = 1;
+    const DB_STORE = 'handles';
+    const DB_DIR_KEY = 'dir';
+    const identityOverlay = document.getElementById('identityOverlay');
+    const identityCards = document.getElementById('identityCards');
+    const appShell = document.getElementById('appShell');
+    const projectTitle = document.getElementById('projectTitle');
+    const projectSubtitle = document.getElementById('projectSubtitle');
+    const reviewerName = document.getElementById('reviewerName');
+    const switchReviewer = document.getElementById('switchReviewer');
+    const navTree = document.getElementById('navTree');
+    const jumpItems = document.getElementById('jumpItems');
+    const filenameBar = document.getElementById('filenameBar');
+    const annotationPill = document.getElementById('annotationPill');
+    const fontDownBtn = document.getElementById('fontDownBtn');
+    const fontResetBtn = document.getElementById('fontResetBtn');
+    const fontUpBtn = document.getElementById('fontUpBtn');
+    const saveControls = document.getElementById('saveControls');
+    const firefoxNotice = document.getElementById('firefoxNotice');
+    const contentArea = document.getElementById('contentArea');
+    const content = document.getElementById('content');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const statusReviewer = document.getElementById('statusReviewer');
+    const statusSummary = document.getElementById('statusSummary');
+    const selectionPopup = document.getElementById('selectionPopup');
+    const popupCommentBtn = document.getElementById('popupCommentBtn');
+    const popupEditBtn = document.getElementById('popupEditBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalQuote = document.getElementById('modalQuote');
+    const modalTextarea = document.getElementById('modalTextarea');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+
+    let annotations = [];
+    let currentFile = null;
+    let rawBlocks = [];
+    let pendingSelection = null;
+    let db = null;
+    let dirHandle = null;
+    let modalKind = null;
+    let saveBtn = null;
+    let fontScale = Number(localStorage.getItem('markuphub_font_scale') || '1');
+
+    projectTitle.textContent = DOCS_DATA.project || 'markup-hub';
+    projectSubtitle.textContent = DOCS_DATA.subtitle || '';
+    document.documentElement.style.setProperty('--font-scale', String(fontScale));
+
+    function escapeHtml(value) {
+      return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function escapeRegex(value) {
+      return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function formatTimestamp(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) { return 'Invalid date'; }
+      return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    function updateReviewerUi() {
+      const reviewer = localStorage.getItem(STORAGE_KEY) || 'Unknown';
+      reviewerName.textContent = reviewer;
+      statusReviewer.textContent = 'Reviewer: ' + reviewer;
+    }
+
+    function showIdentityOverlay() { identityOverlay.style.display = 'flex'; appShell.style.display = 'none'; }
+    function hideIdentityOverlay() { identityOverlay.style.display = 'none'; appShell.style.display = 'block'; }
+
+    function buildIdentityPicker() {
+      identityCards.innerHTML = '';
+      (Array.isArray(DOCS_DATA.reviewers) ? DOCS_DATA.reviewers : []).forEach((name) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'identity-card';
+        button.textContent = name;
+        button.addEventListener('click', () => {
+          localStorage.setItem(STORAGE_KEY, name);
+          updateReviewerUi();
+          hideIdentityOverlay();
+        });
+        identityCards.appendChild(button);
+      });
+    }
+
+    function currentReviewer() { return localStorage.getItem(STORAGE_KEY) || 'Unknown'; }
+    function markUnsaved(message) { statusDot.style.background = '#BA7517'; statusText.textContent = message || 'Unsaved changes'; }
+    function markSaved(message) { statusDot.style.background = '#3B6D11'; statusText.textContent = message || 'Saved'; }
+
+    function setEmptyState(text) {
+      content.innerHTML = '<div class="empty-state">' + escapeHtml(text) + '</div>';
+      rawBlocks = [];
+      currentFile = null;
+      filenameBar.textContent = 'No file selected';
+      buildJumpPanel();
+      updateCounts();
+    }
+
+    function extractLabel(filePath) {
+      if (DOCS_DATA.labels && DOCS_DATA.labels[filePath]) { return DOCS_DATA.labels[filePath]; }
+      const raw = DOCS_DATA.files && DOCS_DATA.files[filePath] ? DOCS_DATA.files[filePath] : '';
+      const match = raw.match(/^#\s+(.+)$/m);
+      if (match) { return match[1].trim(); }
+      const leaf = filePath.split('/').pop() || filePath;
+      return leaf.replace(/\.md$/i, '').replace(/_/g, ' ');
+    }
+
+    function navFiles() {
+      const files = [];
+      Object.values(DOCS_DATA.groups || {}).forEach((entries) => (entries || []).forEach((file) => files.push(file)));
+      return files;
+    }
+
+    function updateCounts() {
+      const currentCount = currentFile ? annotations.filter((item) => item.filename === currentFile).length : 0;
+      annotationPill.textContent = currentCount + (currentCount === 1 ? ' annotation' : ' annotations');
+      document.querySelectorAll('.doc-label').forEach((item) => {
+        const file = item.dataset.file;
+        const count = annotations.filter((annotation) => annotation.filename === file).length;
+        item.textContent = extractLabel(file) + (count > 0 ? ' (' + count + ')' : '');
+      });
+      const filesWithAnnotations = new Set(annotations.map((item) => item.filename)).size;
+      statusSummary.textContent = annotations.length + ' annotations - ' + filesWithAnnotations + ' files';
+    }
+
+    function setFontScale(nextScale) {
+      fontScale = Math.max(0.9, Math.min(1.5, nextScale));
+      localStorage.setItem('markuphub_font_scale', String(fontScale));
+      document.documentElement.style.setProperty('--font-scale', String(fontScale));
+    }
+
+    function buildNav() {
+      navTree.innerHTML = '';
+      Object.entries(DOCS_DATA.groups || {}).forEach(([groupName, files]) => {
+        const label = document.createElement('div');
+        label.className = 'group-label';
+        label.textContent = groupName;
+        navTree.appendChild(label);
+        (files || []).forEach((file) => {
+          const item = document.createElement('div');
+          item.className = 'doc-label';
+          item.dataset.file = file;
+          item.textContent = extractLabel(file);
+          item.addEventListener('click', () => loadDocument(file));
+          navTree.appendChild(item);
+        });
+      });
+      updateCounts();
+    }
+
+    function hidePopup() { selectionPopup.style.display = 'none'; }
+    function showPopup(rect) {
+      const width = 140;
+      const left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.left + rect.width / 2 - width / 2));
+      const top = Math.max(8, rect.top - 44);
+      selectionPopup.style.left = left + 'px';
+      selectionPopup.style.top = top + 'px';
+      selectionPopup.style.display = 'flex';
+    }
+    function highlightQuote(el, quote, type) {
+      if (!el || !quote) { return; }
+      const className = type === 'edit' ? 'hl-edit' : 'hl-comment';
+      if (el.innerHTML.includes('class="' + className + '"')) { return; }
+      const pattern = new RegExp(escapeRegex(quote));
+      if (!pattern.test(el.innerHTML)) { return; }
+      el.innerHTML = el.innerHTML.replace(pattern, '<span class="' + className + '">' + quote + '</span>');
+    }
+
+    function injectThread(annotation) {
+      const target = document.querySelector('[data-pi="' + annotation.paragraphIndex + '"]');
+      const insertionPoint = target && target.closest('table') ? target.closest('table') : target;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'ann-thread ' + (annotation.type === 'edit' ? 'edit-thread' : 'comment-thread');
+      wrapper.dataset.aid = String(annotation.id);
+      const meta = '<div class="thread-meta"><span class="thread-author">' + escapeHtml(annotation.reviewer || 'Unknown') + '</span><span class="thread-badge ' + (annotation.type === 'edit' ? 'badge-edit' : 'badge-comment') + '">' + (annotation.type === 'edit' ? 'Edit' : 'Comment') + '</span><span class="thread-time">' + escapeHtml(formatTimestamp(annotation.timestamp)) + '</span><button class="thread-delete" type="button" onclick="deleteAnnotation(' + JSON.stringify(annotation.id) + ')">x</button></div>';
+      if (annotation.type === 'edit') {
+        wrapper.innerHTML = meta + '<div class="thread-section"><div class="thread-label">Original</div><div class="thread-code">' + escapeHtml(annotation.quote || '') + '</div></div><div class="thread-section"><div class="thread-label">Suggested</div><div class="thread-code">' + escapeHtml(annotation.text || '') + '</div></div>';
+      } else {
+        wrapper.innerHTML = meta + '<div class="thread-body">' + escapeHtml(annotation.text || '') + '</div>';
+      }
+      const existing = document.querySelector('.ann-thread[data-aid="' + String(annotation.id) + '"]');
+      if (existing) { existing.remove(); }
+      if (!insertionPoint) { content.appendChild(wrapper); return; }
+      insertionPoint.insertAdjacentElement('afterend', wrapper);
+    }
+
+    function reinjectAnnotations(filename) {
+      document.querySelectorAll('.ann-thread').forEach((node) => node.remove());
+      annotations.filter((annotation) => annotation.filename === filename).forEach((annotation) => {
+        injectThread(annotation);
+        const target = document.querySelector('[data-pi="' + annotation.paragraphIndex + '"]');
+        highlightQuote(target, annotation.quote, annotation.type);
+      });
+    }
+
+    function assignParagraphIndices() {
+      let index = 0;
+      content.querySelectorAll('p, li, td, h1, h2, h3, h4, blockquote').forEach((node) => {
+        if (node.closest('.ann-thread')) { return; }
+        node.dataset.pi = String(index);
+        node.addEventListener('mouseup', (event) => {
+          const sel = window.getSelection();
+          if (!sel || sel.isCollapsed || sel.toString().trim().length < 2) { hidePopup(); return; }
+          pendingSelection = { text: sel.toString().trim(), paragraphEl: event.currentTarget, paragraphIndex: parseInt(event.currentTarget.dataset.pi, 10) };
+          showPopup(sel.getRangeAt(0).getBoundingClientRect());
+        });
+        index += 1;
+      });
+    }
+
+    function buildJumpPanel() {
+      jumpItems.innerHTML = '';
+      const headings = content.querySelectorAll('h1, h2, h3');
+      if (!headings.length) {
+        const empty = document.createElement('div');
+        empty.className = 'jump-item jump-h2';
+        empty.textContent = 'No sections in this file';
+        jumpItems.appendChild(empty);
+        return;
+      }
+      headings.forEach((heading) => {
+        const item = document.createElement('div');
+        item.className = 'jump-item jump-' + heading.tagName.toLowerCase();
+        item.textContent = heading.textContent.trim();
+        item.addEventListener('click', () => heading.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        jumpItems.appendChild(item);
+      });
+    }
+
+    function stashMath(rawMarkdown) {
+      const stash = [];
+      let text = rawMarkdown;
+      text = text.replace(/\$\$[\s\S]+?\$\$/g, (match) => { const token = '@@MATH' + stash.length + '@@'; stash.push(match); return token; });
+      text = text.replace(/(^|[^\\])\$(?!\$)([^\n]+?)(?<!\\)\$/g, (match, prefix, inner) => { const token = '@@MATH' + stash.length + '@@'; stash.push('$' + inner + '$'); return prefix + token; });
+      return { text, stash };
+    }
+
+    function restoreMath(html, stash) {
+      return html.replace(/@@MATH(\d+)@@/g, (_, index) => stash[Number(index)] || '');
+    }
+
+    function wrapTables() {
+      content.querySelectorAll('table').forEach((table) => {
+        if (table.parentElement && table.parentElement.classList.contains('table-wrap')) { return; }
+        const wrap = document.createElement('div');
+        wrap.className = 'table-wrap';
+        table.parentNode.insertBefore(wrap, table);
+        wrap.appendChild(table);
+      });
+    }
+
+    function loadDocument(file) {
+      currentFile = file;
+      document.querySelectorAll('.doc-label').forEach((item) => item.classList.toggle('active', item.dataset.file === file));
+      filenameBar.textContent = file;
+      const rawMarkdown = DOCS_DATA.files && DOCS_DATA.files[file] ? DOCS_DATA.files[file] : '';
+      const math = stashMath(rawMarkdown);
+      content.innerHTML = restoreMath(marked.parse(math.text), math.stash);
+      wrapTables();
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        if (window.MathJax.typesetClear) { window.MathJax.typesetClear([content]); }
+        window.MathJax.typesetPromise([content]).catch(() => {});
+      }
+      assignParagraphIndices();
+      rawBlocks = rawMarkdown ? rawMarkdown.split(/\n\n+/) : [];
+      reinjectAnnotations(currentFile);
+      buildJumpPanel();
+      contentArea.scrollTo({ top: 0, behavior: 'auto' });
+      updateCounts();
+      hidePopup();
+    }
+    function closeModal() {
+      modalOverlay.style.display = 'none';
+      modalTextarea.value = '';
+      modalTextarea.placeholder = '';
+      modalKind = null;
+    }
+
+    function openModal(kind) {
+      if (!pendingSelection) { return; }
+      modalKind = kind;
+      modalTitle.textContent = kind === 'edit' ? 'Suggest edit' : 'Add comment';
+      modalQuote.textContent = kind === 'edit' ? 'Editing: "' + pendingSelection.text.slice(0, 150) + (pendingSelection.text.length > 150 ? '...' : '') + '"' : pendingSelection.text.slice(0, 200) + (pendingSelection.text.length > 200 ? '...' : '');
+      modalQuote.style.borderLeftColor = kind === 'edit' ? '#0F6E56' : '#BA7517';
+      modalTextarea.value = kind === 'edit' ? (rawBlocks[pendingSelection.paragraphIndex] || '') : '';
+      modalTextarea.placeholder = kind === 'edit' ? 'Edit the raw markdown - $math$ and `code` are preserved' : '';
+      modalSubmitBtn.textContent = kind === 'edit' ? 'Save suggestion' : 'Add comment';
+      modalOverlay.style.display = 'flex';
+      setTimeout(() => modalTextarea.focus(), 0);
+      hidePopup();
+    }
+
+    function createAnnotation(kind) {
+      if (!pendingSelection) { return; }
+      const text = modalTextarea.value.trim();
+      if (!text) { return; }
+      const annotation = { id: Date.now() + Math.random(), type: kind, filename: currentFile, paragraphIndex: pendingSelection.paragraphIndex, quote: pendingSelection.text.slice(0, 300), text, timestamp: new Date().toISOString(), reviewer: currentReviewer() };
+      annotations.push(annotation);
+      injectThread(annotation);
+      highlightQuote(pendingSelection.paragraphEl, pendingSelection.text, kind);
+      markUnsaved();
+      updateCounts();
+      closeModal();
+      pendingSelection = null;
+      if (window.getSelection()) { window.getSelection().removeAllRanges(); }
+    }
+
+    window.deleteAnnotation = function deleteAnnotation(id) {
+      annotations = annotations.filter((item) => String(item.id) !== String(id));
+      const thread = document.querySelector('[data-aid="' + String(id) + '"]');
+      if (thread) { thread.remove(); }
+      markUnsaved();
+      updateCounts();
+    };
+
+    function openDb() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = () => {
+          const upgradeDb = request.result;
+          if (!upgradeDb.objectStoreNames.contains(DB_STORE)) { upgradeDb.createObjectStore(DB_STORE, { keyPath: 'key' }); }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function idbGet(key) { return new Promise((resolve, reject) => { const tx = db.transaction(DB_STORE, 'readonly'); const request = tx.objectStore(DB_STORE).get(key); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
+    function idbPut(value) { return new Promise((resolve, reject) => { const tx = db.transaction(DB_STORE, 'readwrite'); const request = tx.objectStore(DB_STORE).put(value); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); }); }
+    function idbDelete(key) { return new Promise((resolve, reject) => { const tx = db.transaction(DB_STORE, 'readwrite'); const request = tx.objectStore(DB_STORE).delete(key); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); }); }
+
+    async function loadReviewsJson(handle) {
+      try {
+        let fileHandle;
+        try { fileHandle = await handle.getFileHandle('reviews.json'); }
+        catch (error) { annotations = []; if (currentFile) { reinjectAnnotations(currentFile); } updateCounts(); markSaved('Loaded from markup-hub/'); return; }
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        let parsed = { annotations: [] };
+        try { parsed = text.trim() ? JSON.parse(text) : { annotations: [] }; }
+        catch (error) { annotations = []; if (currentFile) { reinjectAnnotations(currentFile); } updateCounts(); markSaved('Loaded from markup-hub/'); return; }
+        annotations = Array.isArray(parsed.annotations) ? parsed.annotations : [];
+        if (currentFile) { reinjectAnnotations(currentFile); }
+        updateCounts();
+        markSaved('Loaded from markup-hub/');
+      } catch (error) {
+        markUnsaved('Unable to load reviews.json');
+      }
+    }
+
+    async function initStorage() {
+      if (typeof window.showDirectoryPicker === 'undefined') { setupFirefoxFallback(); return; }
+      try {
+        db = await openDb();
+        const entry = await idbGet(DB_DIR_KEY);
+        if (!entry || !entry.handle) { return; }
+        dirHandle = entry.handle;
+        const perm = await dirHandle.queryPermission({ mode: 'readwrite' });
+        if (perm === 'granted') { await loadReviewsJson(dirHandle); return; }
+        if (perm === 'prompt') { const nextPerm = await dirHandle.requestPermission({ mode: 'readwrite' }); if (nextPerm === 'granted') { await loadReviewsJson(dirHandle); return; } }
+        dirHandle = null;
+        await idbDelete(DB_DIR_KEY);
+      } catch (error) {
+        markUnsaved('Storage unavailable');
+      }
+    }
+    async function saveReviewsJson() {
+      if (typeof window.showDirectoryPicker === 'undefined') { return; }
+      try {
+        if (!dirHandle) { dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' }); if (db) { await idbPut({ key: DB_DIR_KEY, handle: dirHandle }); } }
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+        const fileHandle = await dirHandle.getFileHandle('reviews.json', { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify({ annotations }, null, 2));
+        await writable.close();
+        const timePart = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        markSaved('Saved ' + timePart);
+        if (saveBtn) { saveBtn.textContent = 'Saved'; setTimeout(() => { if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; } }, 2000); }
+      } catch (error) {
+        markUnsaved('Save canceled or failed');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+      }
+    }
+
+    function mergeAnnotations(nextAnnotations) {
+      const existing = new Map(annotations.map((item) => [String(item.id), item]));
+      nextAnnotations.forEach((item) => existing.set(String(item.id), item));
+      annotations = Array.from(existing.values());
+      if (currentFile) { reinjectAnnotations(currentFile); }
+      updateCounts();
+      markUnsaved('Loaded reviews.json into memory');
+    }
+
+    function downloadReviewsJson() {
+      const blob = new Blob([JSON.stringify({ annotations }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'reviews.json';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      markSaved('Downloaded reviews.json');
+    }
+
+    function setupFirefoxFallback() {
+      saveControls.innerHTML = '';
+      const downloadBtn = document.createElement('button');
+      downloadBtn.type = 'button';
+      downloadBtn.className = 'fallback-button';
+      downloadBtn.textContent = 'Download reviews.json';
+      downloadBtn.addEventListener('click', downloadReviewsJson);
+      const loadBtn = document.createElement('button');
+      loadBtn.type = 'button';
+      loadBtn.className = 'fallback-button';
+      loadBtn.textContent = 'Load reviews.json';
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json';
+      fileInput.style.display = 'none';
+      fileInput.addEventListener('change', async () => {
+        const file = (fileInput.files || [])[0];
+        if (!file) { return; }
+        try {
+          const text = await file.text();
+          const parsed = JSON.parse(text);
+          mergeAnnotations(Array.isArray(parsed.annotations) ? parsed.annotations : []);
+        } catch (error) {
+          markUnsaved('Invalid reviews.json');
+        } finally {
+          fileInput.value = '';
+        }
+      });
+      loadBtn.addEventListener('click', () => fileInput.click());
+      saveControls.appendChild(downloadBtn);
+      saveControls.appendChild(loadBtn);
+      saveControls.appendChild(fileInput);
+      firefoxNotice.style.display = 'flex';
+      firefoxNotice.textContent = 'Firefox detected - download reviews.json and place it in markup-hub/ to share annotations.';
+      contentArea.style.paddingTop = '72px';
+      markSaved('Fallback mode ready');
+    }
+
+    function bootstrap() {
+      buildIdentityPicker();
+      updateReviewerUi();
+      if (localStorage.getItem(STORAGE_KEY)) { hideIdentityOverlay(); } else { showIdentityOverlay(); }
+      buildNav();
+      const firstFile = navFiles()[0];
+      if (firstFile) { loadDocument(firstFile); }
+      else { setEmptyState('Run build_viewer.py after adding papers to collab_config.toml. The viewer is ready to annotate as soon as documents are loaded.'); }
+      saveBtn = document.getElementById('saveBtn');
+      if (saveBtn) { saveBtn.addEventListener('click', saveReviewsJson); }
+      fontDownBtn.addEventListener('click', () => setFontScale(fontScale - 0.1));
+      fontResetBtn.addEventListener('click', () => setFontScale(1));
+      fontUpBtn.addEventListener('click', () => setFontScale(fontScale + 0.1));
+      switchReviewer.addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); updateReviewerUi(); showIdentityOverlay(); });
+      popupCommentBtn.addEventListener('click', () => openModal('comment'));
+      popupEditBtn.addEventListener('click', () => openModal('edit'));
+      modalCancelBtn.addEventListener('click', () => { pendingSelection = null; closeModal(); });
+      modalSubmitBtn.addEventListener('click', () => createAnnotation(modalKind));
+      document.addEventListener('mousedown', (event) => { if (selectionPopup.style.display === 'flex' && !selectionPopup.contains(event.target)) { hidePopup(); } if (modalOverlay.style.display === 'flex' && event.target === modalOverlay) { pendingSelection = null; closeModal(); } });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') { hidePopup(); pendingSelection = null; closeModal(); }
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'enter' && modalOverlay.style.display === 'flex') { event.preventDefault(); createAnnotation(modalKind); }
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') { event.preventDefault(); if (typeof window.showDirectoryPicker === 'undefined') { downloadReviewsJson(); } else { saveReviewsJson(); } }
+      });
+      initStorage();
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>

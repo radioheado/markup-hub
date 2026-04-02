@@ -1,0 +1,2 @@
+﻿# tomllib is stdlib in Python 3.11+. Only needed for older versions.
+tomli>=2.0.0; python_version < "3.11"
