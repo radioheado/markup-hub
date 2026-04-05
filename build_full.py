@@ -8,9 +8,9 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from lib.config import resolve_main_and_full_paths
-from lib.manifests import collect_group_sources
-from lib.numbering import number_group
+from core.config import resolve_main_and_full_paths
+from core.manifests import collect_group_sources
+from core.numbering import number_group
 
 HEADER_PREFIX = "<!-- MARKUP-HUB-FULL "
 FILE_PREFIX = "<!-- MARKUP-HUB-FILE "

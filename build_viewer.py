@@ -5,9 +5,9 @@ import json
 import sys
 from pathlib import Path
 
-from lib.config import load_config
-from lib.manifests import collect_group_sources, read_text
-from lib.numbering import number_group
+from core.config import load_config
+from core.manifests import collect_group_sources, read_text
+from core.numbering import number_group
 
 
 def emit(text: str) -> None:

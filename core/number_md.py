@@ -99,7 +99,7 @@ def main() -> int:
                 )
                 numbered_lines.append(f"## {number} {title}")
                 continue
-            # H3 — subsection X.Y.Z; resets on each new H2
+            # H3 headings become subsection X.Y.Z and reset under each new H2.
             if level == 3:
                 subsection += 1
                 number = f"{chapter}.{section}.{subsection}"
@@ -178,3 +178,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

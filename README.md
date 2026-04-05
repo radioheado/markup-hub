@@ -65,11 +65,18 @@ markup-hub/
 |-- sync_full.py
 |-- collab_config.toml
 |-- collab_viewer_template.html
-|-- hub_tools/
-|-- lib/
+|-- core/
 |   |-- config.py
 |   |-- manifests.py
-|   `-- numbering.py
+|   |-- merge_md.py
+|   |-- number_md.py
+|   |-- numbering.py
+|   `-- validate_md.py
+|-- export/
+|   |-- build_html.py
+|   |-- build_word.ps1
+|   |-- export_docx.py
+|   `-- export_pdf.py
 `-- README.md
 ```
 
@@ -98,9 +105,9 @@ enabled = true
 
 You do not need to set up a separate command for each chapter or manually pass manuscript paths every time.
 
-- If `collab_config.toml` contains only one paper group, `python meeting.py build` and `python meeting.py sync` will automatically use that paper.
+- If `collab_config.toml` contains only one enabled paper group, `python meeting.py build` and `python meeting.py sync` will automatically use that paper.
 - If you keep multiple paper groups in the config, set `default_group = "..."` to make one of them the default no-argument target.
-- If `collab_config.toml` contains multiple paper groups, you only need to tell the script which paper you want for that run, for example `python meeting.py build --group "Proposal B"`.
+- If you want to work on a different paper for a specific run, use `--group`, for example `python meeting.py build --group "Proposal B"`.
 
 In other words, `--group` selects a paper, not a chapter.
 
@@ -150,7 +157,7 @@ Build the meeting file:
 python meeting.py build
 ```
 
-Build all enabled papers in the config:
+Build `paper.full.md` for all enabled papers in the config:
 
 ```powershell
 python meeting.py build-all
@@ -174,7 +181,7 @@ Prompt for a Git snapshot after sync:
 python meeting.py sync --prompt-commit
 ```
 
-When multiple groups are configured:
+When multiple groups are configured and you want to target a different paper:
 
 ```powershell
 python meeting.py build --group "Metrics Paper"
@@ -248,12 +255,14 @@ Recommended practice:
 3. Set the `reviewers` list for the HTML viewer
 4. Run either the HTML reviewer flow or the meeting flow
 
-## Library modules
+## Internal layout
 
-- `lib/config.py`: config loading and group/path resolution
-- `lib/manifests.py`: manifest parsing, file loading, labels, path normalization
-- `lib/numbering.py`: numbering and reference handling
-- `hub_tools/`: hub-owned manuscript build/export scripts used by `manuscript.py`
+- `core/`: manuscript and configuration logic
+- `core/config.py`: config loading and group/path resolution
+- `core/manifests.py`: manifest parsing, file loading, labels, and path normalization
+- `core/merge_md.py`, `core/number_md.py`, `core/validate_md.py`: manuscript pipeline steps
+- `core/numbering.py`: numbering and reference handling
+- `export/`: HTML, DOCX, PDF, and Word-export helpers used by `manuscript.py`
 
 ## Scope
 

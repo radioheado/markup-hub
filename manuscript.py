@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from lib.config import load_config, resolve_group_settings, select_group
+from core.config import load_config, resolve_group_settings, select_group
 
 
 def run_python(script: Path, args: list[str], cwd: Path) -> int:
@@ -58,21 +58,22 @@ def main() -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
-    tools_dir = hub_dir / "hub_tools"
+    core_dir = hub_dir / "core"
+    export_dir = hub_dir / "export"
     docx_template = group_data.get("docx_template")
     template_args: list[str] = []
     if isinstance(docx_template, str) and docx_template.strip():
         template_path = (hub_dir / docx_template).resolve()
         template_args = ["--template", str(template_path)]
 
-    steps: dict[str, tuple[str, list[str]] | tuple[str, None]] = {
-        "merge": ("merge_md.py", []),
-        "number": ("number_md.py", []),
-        "validate": ("validate_md.py", ["--main", "main.md"]),
-        "html": ("build_html.py", []),
-        "docx": ("export_docx.py", template_args),
-        "pdf": ("export_pdf.py", []),
-        "word": ("build_word.ps1", None),
+    steps: dict[str, tuple[Path, list[str] | None]] = {
+        "merge": (core_dir / "merge_md.py", []),
+        "number": (core_dir / "number_md.py", []),
+        "validate": (core_dir / "validate_md.py", ["--main", "main.md"]),
+        "html": (export_dir / "build_html.py", []),
+        "docx": (export_dir / "export_docx.py", template_args),
+        "pdf": (export_dir / "export_pdf.py", []),
+        "word": (export_dir / "build_word.ps1", None),
     }
 
     if args.action == "all":
@@ -83,9 +84,8 @@ def main() -> int:
     print(f"Group: {group_name}")
     print(f"Project root: {project_root}")
     for action in order:
-        script_name, script_args = steps[action]
+        script_path, script_args = steps[action]
         print(f"==> {action}")
-        script_path = tools_dir / script_name
         exit_code = (
             run_powershell(script_path, project_root)
             if script_args is None

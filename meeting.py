@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from lib.config import load_config, resolve_groups
+from core.config import load_config, resolve_groups
 
 
 def run_step(script: str, args: list[str], hub_dir: Path) -> int:
