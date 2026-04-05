@@ -60,10 +60,12 @@ markup-hub/
 |-- apply_review.py
 |-- build_full.py
 |-- build_viewer.py
+|-- manuscript.py
 |-- meeting.py
 |-- sync_full.py
 |-- collab_config.toml
 |-- collab_viewer_template.html
+|-- hub_tools/
 |-- lib/
 |   |-- config.py
 |   |-- manifests.py
@@ -86,10 +88,12 @@ default_group = "Discussion Topic A"
 [groups."Discussion Topic A"]
 main = "../discussion-a/main.md"
 enabled = true
+docx_template = "../discussion-a/src/archive/template.docx"
 
 [groups."Proposal B"]
 main = "../proposal-b/main.md"
 enabled = true
+# docx_template = "../proposal-b/src/archive/template.docx"
 ```
 
 You do not need to set up a separate command for each chapter or manually pass manuscript paths every time.
@@ -177,6 +181,30 @@ python meeting.py build --group "Metrics Paper"
 python meeting.py sync --group "Metrics Paper"
 ```
 
+### Manuscript pipeline
+
+Use this when you want the hub to run the regular manuscript build/export steps for a paper repo.
+
+Examples:
+
+```powershell
+python manuscript.py merge
+python manuscript.py number
+python manuscript.py validate
+python manuscript.py html
+python manuscript.py docx
+python manuscript.py pdf
+python manuscript.py all
+```
+
+With multiple configured papers:
+
+```powershell
+python manuscript.py all --group "Metrics Paper"
+```
+
+`manuscript.py all` runs the full pipeline from the hub against the selected paper repo. The paper repo provides content and assets; the hub owns the tooling.
+
 ## How the meeting workflow works
 
 `meeting.py build` creates a generated `paper.full.md` beside the target paper's `main.md`. That file includes protected source markers and numbered headings/captions so it is convenient to read during a meeting.
@@ -225,6 +253,7 @@ Recommended practice:
 - `lib/config.py`: config loading and group/path resolution
 - `lib/manifests.py`: manifest parsing, file loading, labels, path normalization
 - `lib/numbering.py`: numbering and reference handling
+- `hub_tools/`: hub-owned manuscript build/export scripts used by `manuscript.py`
 
 ## Scope
 

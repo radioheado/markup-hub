@@ -27,6 +27,15 @@ def resolve_groups(hub_dir: Path, config: dict) -> dict[str, Path]:
     }
 
 
+def resolve_group_settings(config: dict) -> dict[str, dict]:
+    groups_cfg = config.get("groups", {})
+    return {
+        group_name: group_data
+        for group_name, group_data in groups_cfg.items()
+        if is_group_enabled(group_data)
+    }
+
+
 def default_full_path(main_path: Path) -> Path:
     return main_path.parent / "paper.full.md"
 

@@ -22,10 +22,12 @@ reviewers = ["Reviewer One", "Reviewer Two"]
 [groups."Paper A"]
 main = "../paper-a/main.md"
 enabled = true
+docx_template = "../paper-a/src/archive/template.docx"
 
 [groups."Proposal B"]
 main = "../proposal-b/main.md"
 enabled = false
+# docx_template = "../proposal-b/src/archive/template.docx"
 
 # Optional label overrides. Keys should match the markdown file paths as seen
 # from markup-hub/ after resolving INCLUDE directives from each main.md file.

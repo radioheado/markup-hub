@@ -6,6 +6,8 @@ reviews.json
 collab_viewer.html
 collab_viewer_preview.html
 collab_viewer_local.html
+manuscript_tools
+manuscript_ops
 
 # Python cache artifacts
 __pycache__/
