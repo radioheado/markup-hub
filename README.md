@@ -147,6 +147,10 @@ Review flow:
 python apply_review.py
 ```
 
+If you prefer the VS Code Run and Debug panel, use:
+
+- `Hub: Build Viewer`
+
 ### Meeting workflow
 
 Use this when you want one integrated manuscript file for live editing in VS Code.
@@ -188,6 +192,12 @@ python meeting.py build --group "Metrics Paper"
 python meeting.py sync --group "Metrics Paper"
 ```
 
+If you prefer the VS Code Run and Debug panel, use:
+
+- `Hub: Meeting Build`
+- `Hub: Meeting Sync Dry Run`
+- `Hub: Meeting Sync`
+
 ### Manuscript pipeline
 
 Use this when you want the hub to run the regular manuscript build/export steps for a paper repo.
@@ -211,6 +221,10 @@ python manuscript.py all --group "Metrics Paper"
 ```
 
 `manuscript.py all` runs the full pipeline from the hub against the selected paper repo. The paper repo provides content and assets; the hub owns the tooling.
+
+If you prefer the VS Code Run and Debug panel, use:
+
+- `Hub: Manuscript All`
 
 ## How the meeting workflow works
 
@@ -263,6 +277,37 @@ Recommended practice:
 2. Add your paper folders under `[groups]`
 3. Set the `reviewers` list for the HTML viewer
 4. Run either the HTML reviewer flow or the meeting flow
+
+## VS Code launch configs
+
+`markup-hub` includes [launch.json](/c:/Users/geeny/OneDrive%20-%20George%20Mason%20University%20-%20O365%20Production/Mihai%20Boicu%27s%20files%20-%20PhD%20Juan%20Huang%20-%20Shared/markup-hub/.vscode/launch.json) so the most common workflows can be started from the Run and Debug panel.
+
+To use them:
+
+1. Open `markup-hub` as the workspace root in VS Code
+2. Open `Run and Debug`
+3. Choose a launch config from the dropdown
+4. Click the green Run button
+
+Available launch configs:
+
+- `Hub: Build Viewer`
+  Rebuilds the HTML reviewer from the current Markdown sources
+- `Hub: Meeting Build`
+  Regenerates `paper.full.md` for the default or selected paper
+- `Hub: Meeting Sync Dry Run`
+  Previews sync-back from `paper.full.md` without writing files
+- `Hub: Meeting Sync`
+  Writes meeting edits from `paper.full.md` back into the chapter files
+- `Hub: Manuscript All`
+  Runs the full manuscript pipeline (`merge`, `number`, `validate`, `html`, `docx`, `pdf`)
+
+Recommended day-to-day use:
+
+- after editing chapter Markdown and wanting to refresh the browser reviewer: `Hub: Build Viewer`
+- before a meeting: `Hub: Meeting Build`
+- after meeting edits, to safely preview the result: `Hub: Meeting Sync Dry Run`
+- after confirming the preview looks right: `Hub: Meeting Sync`
 
 ## Internal layout
 
