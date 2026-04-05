@@ -21,6 +21,7 @@ BLOCK_RE = re.compile(
 LEVEL1_RE = re.compile(r"^(#)\s+\d+\.\s+(.*)$")
 LEVEL23_RE = re.compile(r"^(##|###)\s+\d+(?:\.\d+)+\s+(.*)$")
 CAPTION_PREFIX_RE = re.compile(r"^\*\*(Table|Figure) (?P<token>\{\{(?:tbl|fig):[^}]+\}\}|\d+)\.\*\*")
+BUILD_DATE_TOKEN = "{{build_date}}"
 
 
 def emit(text: str) -> None:
@@ -97,7 +98,13 @@ def build_caption_prefix_map(raw_text: str, processed_text: str) -> list[tuple[s
     return mappings
 
 
-def restore_source_text(edited_text: str, raw_text: str, processed_text: str) -> str:
+def restore_source_text(
+    edited_text: str,
+    raw_text: str,
+    processed_text: str,
+    *,
+    build_date: str | None,
+) -> str:
     caption_prefix_map = build_caption_prefix_map(raw_text, processed_text)
     restored_lines: list[str] = []
     for line in edited_text.splitlines():
@@ -108,6 +115,8 @@ def restore_source_text(edited_text: str, raw_text: str, processed_text: str) ->
                 break
         restored_lines.append(updated)
     restored = "\n".join(restored_lines)
+    if build_date and BUILD_DATE_TOKEN in raw_text:
+        restored = restored.replace(build_date, BUILD_DATE_TOKEN)
     if edited_text.endswith("\n"):
         restored += "\n"
     return restored
@@ -172,6 +181,8 @@ def main() -> int:
     include_metadata = bool(header.get("includeMetadata", False))
     numbering_cfg = header.get("numbering", {})
     resolve_references = bool(numbering_cfg.get("references", False)) if isinstance(numbering_cfg, dict) else False
+    generated_at = str(header.get("generated", ""))
+    build_date = generated_at[:10] if len(generated_at) >= 10 else None
     main_dir = main_path.parent.resolve()
 
     file_list, raw_group_files, _labels = collect_group_sources(
@@ -206,7 +217,12 @@ def main() -> int:
             return 1
 
         original_processed = processed_group_files[hub_rel]
-        restored = restore_source_text(body, current_raw, original_processed)
+        restored = restore_source_text(
+            body,
+            current_raw,
+            original_processed,
+            build_date=build_date,
+        )
         normalized_restored = restored.rstrip("\n") + "\n"
         normalized_current = current_raw.rstrip("\n") + "\n"
         if normalized_restored == normalized_current:

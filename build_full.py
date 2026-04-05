@@ -15,6 +15,7 @@ from core.numbering import number_group
 HEADER_PREFIX = "<!-- MARKUP-HUB-FULL "
 FILE_PREFIX = "<!-- MARKUP-HUB-FILE "
 FILE_END = "<!-- /MARKUP-HUB-FILE -->"
+BUILD_DATE_TOKEN = "{{build_date}}"
 
 
 def emit(text: str) -> None:
@@ -55,6 +56,10 @@ def json_comment(prefix: str, payload: dict[str, object]) -> str:
     return f"{prefix}{json.dumps(payload, ensure_ascii=False, separators=(',', ':'))} -->"
 
 
+def apply_dynamic_placeholders(text: str, build_date: str) -> str:
+    return text.replace(BUILD_DATE_TOKEN, build_date)
+
+
 def build_full_document(
     hub_dir: Path,
     main_path: Path,
@@ -73,6 +78,7 @@ def build_full_document(
     processed_group_files = number_group(file_list, raw_group_files, resolve_references=resolve_references)
     main_dir = main_path.parent.resolve()
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    build_date = datetime.now().astimezone().date().isoformat()
 
     header_payload = {
         "version": 1,
@@ -91,7 +97,7 @@ def build_full_document(
     for rel_path in file_list:
         abs_path = (hub_dir / rel_path).resolve()
         raw = raw_group_files[rel_path]
-        processed = processed_group_files[rel_path]
+        processed = apply_dynamic_placeholders(processed_group_files[rel_path], build_date)
         block_payload = {
             "path": os.path.relpath(abs_path, main_dir).replace("\\", "/"),
             "label": labels.get(rel_path, Path(rel_path).stem),

@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Hub: Build Viewer",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/build_viewer.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Hub: Meeting Build",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/meeting.py",
+      "args": ["build"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Hub: Meeting Sync Dry Run",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/meeting.py",
+      "args": ["sync", "--dry-run"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Hub: Meeting Sync",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/meeting.py",
+      "args": ["sync"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Hub: Manuscript All",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manuscript.py",
+      "args": ["all"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

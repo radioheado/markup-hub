@@ -216,6 +216,14 @@ python manuscript.py all --group "Metrics Paper"
 
 `meeting.py build` creates a generated `paper.full.md` beside the target paper's `main.md`. That file includes protected source markers and numbered headings/captions so it is convenient to read during a meeting.
 
+Important:
+
+- `paper.full.md` is generated, not source
+- it is safe and recommended to keep `paper.full.md` out of Git
+- the files Git should track are `main.md`, chapter files under `src/`, and supporting assets
+- after the meeting, run `meeting.py sync` to write accepted edits back into the real source files
+- use `{{build_date}}` in source Markdown when you want the generated full manuscript to show the current build date automatically
+
 `meeting.py sync` then:
 
 - reads the edited `paper.full.md`
@@ -246,6 +254,7 @@ Recommended practice:
 
 - keep chapter Markdown files under Git
 - treat `paper.full.md` as a generated meeting artifact
+- add `paper.full.md` to the paper repo's `.gitignore`
 - create Git snapshots after meaningful sync events, not after every draft edit
 
 ## Setup
