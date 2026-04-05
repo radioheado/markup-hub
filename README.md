@@ -1,36 +1,33 @@
 ﻿# markup-hub
 
-`markup-hub` is a lightweight collaboration layer for long-form Markdown projects. It renders manifest-driven chapter files into a single local HTML review surface, lets reviewers leave inline comments or edit suggestions, and writes those review traces back into the source files when you are ready to process them.
+`markup-hub` is a Markdown-first collaboration layer for long-form research writing. It keeps chapter files as the source of truth, assembles them through a `main.md` manifest, and supports two stable review surfaces:
 
-No server. No login. No database setup. Just Markdown, a browser, and a folder layout your team already understands.
+- an HTML reviewer for browser-based reading, comments, and edit suggestions
+- a full-manuscript Markdown workflow for in-meeting editing in VS Code
 
-## Why it exists
+The repository is intentionally small and local-first. No server, no database, and no required cloud platform beyond the shared folder you already use.
 
-Many writing workflows eventually hit the same problem:
+## What it does
 
-- source files live comfortably in Markdown
-- export to Word or PDF works, but is fragile and time-consuming to maintain
-- reviewers want one readable place to comment without losing traceability
+`markup-hub` currently supports:
 
-`markup-hub` keeps Markdown as the source of truth while giving collaborators a stable browser-based review surface.
+- manifest-driven multi-file manuscript assembly
+- numbering for chapters, sections, tables, and figures
+- a local HTML reviewer with inline annotations saved to `reviews.json`
+- applying saved HTML review comments back into source Markdown
+- building a reversible `paper.full.md` for direct editing
+- syncing edits from `paper.full.md` back into chapter files
+- optional Git snapshot prompting after sync
 
-## Features
+## Source model
 
-- renders multi-file Markdown projects from a `main.md` manifest
-- resolves heading, table, figure, and section numbering across included files
-- provides a local HTML viewer with navigation and inline annotation support
-- saves reviewer comments to `reviews.json`
-- applies saved reviews back into source Markdown as review blocks
+The source of truth is always:
 
-## Project model
+1. `main.md`
+2. chapter files under `src/` or other included paths
+3. your numbering and build rules
 
-`markup-hub` is the engine, not the content store. Your actual papers, proposals, notes, or chapter folders should live beside it or anywhere else on disk, as long as the config can point to them.
-
-Each document project only needs a simple contract:
-
-1. a `main.md` manifest
-2. chapter or source files, commonly under `src/`
-3. one `<!-- INCLUDE ... -->` line per source file in the manifest
+Reviewer-facing artifacts are generated from those sources.
 
 Example manifest:
 
@@ -40,50 +37,43 @@ Example manifest:
 <!-- INCLUDE src/results.md -->
 ```
 
-## Repository layout
-
-```text
-markup-hub/
-├── build_viewer.py
-├── apply_review.py
-├── collab_config.toml
-├── collab_viewer_template.html
-├── lib/
-│   ├── manifests.py
-│   └── numbering.py
-├── examples/
-│   └── sample-paper/
-└── README.md
-```
-
-A typical workspace might look like this:
+## Recommended workspace layout
 
 ```text
 workspace/
-├── collab_viewer.html
-├── markup-hub/
-├── paper-a/
-│   ├── main.md
-│   └── src/
-└── proposal-b/
-    ├── main.md
-    └── src/
+|-- markup-hub/
+|-- discussion-a/
+|   |-- main.md
+|   |-- src/
+|   `-- .git/
+|-- proposal-b/
+|   |-- main.md
+|   |-- src/
+|   `-- .git/
+`-- collab_viewer.html
 ```
 
-This is the recommended setup for most users:
+Inside `markup-hub/`:
 
-- keep `markup-hub/` as the tool repo
-- keep each paper or document in its own sibling folder
-- generate `collab_viewer.html` into the workspace root so collaborators can find it quickly
-
-Your document folders do not need to live inside `markup-hub/`.
-They can live anywhere your machine can reach. The only requirement is that
-`collab_config.toml` points each group at a valid `main.md` manifest.
+```text
+markup-hub/
+|-- apply_review.py
+|-- build_full.py
+|-- build_viewer.py
+|-- meeting.py
+|-- sync_full.py
+|-- collab_config.toml
+|-- collab_viewer_template.html
+|-- lib/
+|   |-- config.py
+|   |-- manifests.py
+|   `-- numbering.py
+`-- README.md
+```
 
 ## Configuration
 
-All viewer inputs are defined in `collab_config.toml`.
-Start by copying `collab_config.example.toml` to `collab_config.toml`.
+All paper-level paths live in `collab_config.toml`. This is the main way to keep the workflow easy to remember as your manuscript folders grow.
 
 Minimal example:
 
@@ -91,92 +81,157 @@ Minimal example:
 project = "Research Workspace"
 subtitle = "Spring 2026"
 reviewers = ["Reviewer One", "Reviewer Two"]
+default_group = "Discussion Topic A"
 
-[groups."Paper A"]
-main = "../paper-a/main.md"
+[groups."Discussion Topic A"]
+main = "../discussion-a/main.md"
+enabled = true
 
 [groups."Proposal B"]
 main = "../proposal-b/main.md"
+enabled = true
 ```
 
-Those `main = ...` paths are where you tell the hub where your own paper folders live.
-In the common sibling-folder layout above, `../paper-a/main.md` means:
+You do not need to set up a separate command for each chapter or manually pass manuscript paths every time.
 
-- start in `markup-hub/`
-- go up one level to the workspace root
-- enter `paper-a/`
-- load `main.md`
+- If `collab_config.toml` contains only one paper group, `python meeting.py build` and `python meeting.py sync` will automatically use that paper.
+- If you keep multiple paper groups in the config, set `default_group = "..."` to make one of them the default no-argument target.
+- If `collab_config.toml` contains multiple paper groups, you only need to tell the script which paper you want for that run, for example `python meeting.py build --group "Proposal B"`.
 
-### Reviewers
+In other words, `--group` selects a paper, not a chapter.
 
-The `reviewers` list controls the identity picker shown in the viewer.
-Set this to your own collaborators, for example:
+If you want to temporarily exclude a paper from all config-driven workflows, you have two options:
+
+- set `enabled = false` inside that group's config block
+- or comment out that group block in the TOML file
+
+Example:
 
 ```toml
-reviewers = ["Alice Smith", "Bob Lee", "Advisor Name"]
+[groups."Proposal B"]
+main = "../proposal-b/main.md"
+enabled = false
 ```
 
-## Setup
+## Main workflows
 
-1. Clone or copy `markup-hub`
-2. Copy `collab_config.example.toml` to `collab_config.toml`
-3. Set `reviewers = [...]` to your own reviewer names
-4. Point each group at a `main.md` manifest in one of your document folders
-5. Run:
+### HTML reviewer
 
-```bash
+Use this when you want a browser-based reading and annotation surface.
+
+Build the viewer:
+
+```powershell
 python build_viewer.py
 ```
 
-By default this writes `../collab_viewer.html`, but you can choose any output path:
+Review flow:
 
-```bash
-python build_viewer.py --out ./collab_viewer.html
-```
+1. Open the generated `collab_viewer.html`
+2. Add comments or edit suggestions
+3. Save annotations to `reviews.json`
+4. Apply them back into the chapter files
 
-Then open the generated HTML file in Chrome or Edge.
-
-## Review workflow
-
-### For authors
-
-1. Update Markdown files in your document project
-2. Rebuild the viewer:
-
-```bash
-python build_viewer.py
-```
-
-3. Share the generated `collab_viewer.html`
-4. After reviewers save annotations, apply them:
-
-```bash
+```powershell
 python apply_review.py
 ```
 
-### For reviewers
+### Meeting workflow
 
-1. Open `collab_viewer.html`
-2. Pick your identity
-3. Select text and add comments or edit suggestions
-4. Click `Save`
+Use this when you want one integrated manuscript file for live editing in VS Code.
 
-## Reusable library modules
+Build the meeting file:
 
-Generic manuscript logic is being moved into `lib/` so the hub can evolve into a reusable toolkit instead of depending on one paper repo's private scripts.
+```powershell
+python meeting.py build
+```
 
-- `lib/manifests.py`: manifest parsing, file loading, path normalization, labels
-- `lib/numbering.py`: heading numbering and table/figure/section reference resolution
+Build all enabled papers in the config:
 
-## Example project
+```powershell
+python meeting.py build-all
+```
 
-The repo includes `examples/sample-paper/` as a tiny self-contained example for testing, demos, and GitHub presentation without bundling real research material.
+Sync edits back into source files:
+
+```powershell
+python meeting.py sync
+```
+
+Preview a sync without writing files:
+
+```powershell
+python meeting.py sync --dry-run
+```
+
+Prompt for a Git snapshot after sync:
+
+```powershell
+python meeting.py sync --prompt-commit
+```
+
+When multiple groups are configured:
+
+```powershell
+python meeting.py build --group "Metrics Paper"
+python meeting.py sync --group "Metrics Paper"
+```
+
+## How the meeting workflow works
+
+`meeting.py build` creates a generated `paper.full.md` beside the target paper's `main.md`. That file includes protected source markers and numbered headings/captions so it is convenient to read during a meeting.
+
+`meeting.py sync` then:
+
+- reads the edited `paper.full.md`
+- maps each block back to its original chapter file
+- strips generated heading numbers back to plain Markdown headings
+- restores table and figure label placeholders in source files
+- refuses to overwrite source files if they changed since the full file was built unless you explicitly force it
+- writes `.bak` backups before changing chapter files
+
+The chapter files remain the real manuscript source.
+`paper.full.md` is a generated collaboration surface.
+
+## Numbering
+
+Numbering remains part of the build layer, not the source layer.
+
+- source files keep semantic Markdown
+- numbered headings and captions are generated for review artifacts
+- sync restores source-friendly Markdown before writing back
+
+This preserves compatibility with your existing manuscript tooling.
+
+## Git usage
+
+Each paper folder can live in its own Git repository even when stored inside a shared OneDrive workspace. Git is used for safety and revision control, not for day-to-day syncing between collaborators.
+
+Recommended practice:
+
+- keep chapter Markdown files under Git
+- treat `paper.full.md` as a generated meeting artifact
+- create Git snapshots after meaningful sync events, not after every draft edit
+
+## Setup
+
+1. Copy `collab_config.example.toml` to `collab_config.toml`
+2. Add your paper folders under `[groups]`
+3. Set the `reviewers` list for the HTML viewer
+4. Run either the HTML reviewer flow or the meeting flow
+
+## Library modules
+
+- `lib/config.py`: config loading and group/path resolution
+- `lib/manifests.py`: manifest parsing, file loading, labels, path normalization
+- `lib/numbering.py`: numbering and reference handling
 
 ## Scope
 
-`markup-hub` is intentionally narrow:
+`markup-hub` does not replace your manuscript repositories. It provides stable review and collaboration tooling around Markdown-first papers.
 
-- it does not replace your manuscript repo
-- it does not require a web server
-- it does not prescribe how you export to Word or PDF
-- it focuses on reading, reviewing, and traceable annotation over Markdown source
+Its current focus is:
+
+- keeping long-form research writing maintainable
+- preserving traceability back to chapter files
+- giving collaborators a choice between HTML review and direct manuscript editing

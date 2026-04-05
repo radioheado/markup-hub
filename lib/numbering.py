@@ -15,7 +15,12 @@ def normalize_section_label(text: str) -> str:
     return text
 
 
-def number_group(file_order: list[str], file_contents: dict[str, str]) -> dict[str, str]:
+def number_group(
+    file_order: list[str],
+    file_contents: dict[str, str],
+    *,
+    resolve_references: bool = True,
+) -> dict[str, str]:
     chapter = 0
     section = 0
     subsection = 0
@@ -80,6 +85,9 @@ def number_group(file_order: list[str], file_contents: dict[str, str]) -> dict[s
                 out_lines.append(line)
 
         numbered[rel_path] = "\n".join(out_lines)
+
+    if not resolve_references:
+        return numbered
 
     resolved: dict[str, str] = {}
     for rel_path in file_order:

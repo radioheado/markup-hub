@@ -1,15 +1,11 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
-try:
-    import tomllib
-except ImportError:  # pragma: no cover
-    import tomli as tomllib
-
+from lib.config import load_config
 from lib.manifests import collect_group_sources, read_text
 from lib.numbering import number_group
 
@@ -36,8 +32,7 @@ def main() -> int:
     out_path = (hub_dir / args.out).resolve()
     template_path = hub_dir / 'collab_viewer_template.html'
 
-    with config_path.open('rb') as fh:
-        config = tomllib.load(fh)
+    config = load_config(config_path)
 
     labels_cfg = {str(key).replace('\\', '/'): value for key, value in config.get('labels', {}).items()}
     groups_cfg = config.get('groups', {})
@@ -47,6 +42,8 @@ def main() -> int:
     total_chars = 0
 
     for group_name, group_data in groups_cfg.items():
+        if not group_data.get('enabled', True):
+            continue
         main_path = (hub_dir / group_data['main']).resolve()
         try:
             main_content = read_text(main_path)

@@ -11,4 +11,3 @@ This is a minimal sample paper that demonstrates the manifest format used by
 | Output | viewer-ready markdown |
 
 See {{sec:results}} for the next section.
-

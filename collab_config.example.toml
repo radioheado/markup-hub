@@ -3,6 +3,7 @@
 
 project = "Research Workspace"
 subtitle = "Spring 2026"
+default_group = "Paper A"
 
 # These names appear in the viewer identity picker.
 reviewers = ["Reviewer One", "Reviewer Two"]
@@ -20,9 +21,11 @@ reviewers = ["Reviewer One", "Reviewer Two"]
 
 [groups."Paper A"]
 main = "../paper-a/main.md"
+enabled = true
 
 [groups."Proposal B"]
 main = "../proposal-b/main.md"
+enabled = false
 
 # Optional label overrides. Keys should match the markdown file paths as seen
 # from markup-hub/ after resolving INCLUDE directives from each main.md file.

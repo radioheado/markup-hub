@@ -10,6 +10,7 @@ collab_viewer_local.html
 # Python cache artifacts
 __pycache__/
 *.py[cod]
+*.bak
 
 # OS/editor noise
 .DS_Store
