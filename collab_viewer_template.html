@@ -33,15 +33,16 @@
     .identity-card { width: 160px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); font-size: 15px; font-weight: 500; cursor: pointer; color: var(--color-text-primary); transition: border 0.15s, background 0.15s, color 0.15s; }
     .identity-card:hover { border: 2px solid #378ADD; background: var(--color-background-info); color: var(--color-text-info); }
     .app-shell { display: none; }
-    .sidebar { position: fixed; left: 0; top: 0; width: 270px; height: 100vh; background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; overflow: hidden; }
-    .sidebar-header { padding: 16px 14px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .sidebar { position: fixed; left: 0; top: 0; width: 320px; height: 100vh; background: linear-gradient(180deg, #f6f1e8 0%, #f2ece2 100%); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; overflow: hidden; box-shadow: inset -1px 0 0 rgba(255,255,255,0.45); }
+    .sidebar-header { padding: 18px 18px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); background: rgba(255,255,255,0.35); }
     .sidebar-project { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
     .sidebar-subtitle { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
-    .reviewer-badge { margin: 10px 10px 4px; padding: 8px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); font-size: 12px; font-weight: 500; color: var(--color-text-info); }
+    .reviewer-badge { margin: 12px 14px 6px; padding: 9px 11px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: rgba(255,255,255,0.82); font-size: 12px; font-weight: 500; color: var(--color-text-info); box-shadow: 0 1px 0 rgba(255,255,255,0.6); }
     .reviewer-switch { font-size: 11px; color: var(--color-text-tertiary); margin-left: 6px; cursor: pointer; text-decoration: underline; font-weight: 400; }
-    .outline-panel { flex: 1; overflow-y: auto; padding: 8px 0 12px; scrollbar-width: thin; }
-    .doc-switcher { border-top: 0.5px solid var(--color-border-tertiary); max-height: 220px; overflow-y: auto; flex-shrink: 0; padding: 8px 0 12px; }
-    .group-label { font-size: 9px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--color-text-tertiary); padding: 10px 14px 4px; }
+    .outline-panel { flex: 1; overflow-y: auto; padding: 4px 0 14px; scrollbar-width: thin; }
+    .doc-switcher { border-top: 0.5px solid var(--color-border-tertiary); max-height: 260px; overflow-y: auto; flex-shrink: 0; padding: 10px 0 14px; background: rgba(255,255,255,0.24); }
+    .group-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--color-text-tertiary); padding: 12px 18px 6px; }
+    .group-context { font-size: 11px; color: var(--color-text-secondary); padding: 0 18px 10px; }
     .nav-item { padding: 7px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; border-left: 2px solid transparent; }
     .nav-item.active { background: var(--color-background-info); border-left-color: #378ADD; }
     .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--color-border-tertiary); flex-shrink: 0; }
@@ -49,25 +50,30 @@
     .nav-label { font-size: 12px; color: var(--color-text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .nav-item.active .nav-label { color: var(--color-text-info); font-weight: 500; }
     .nav-badge { font-size: 9px; background: #BA7517; color: #fff; border-radius: 8px; padding: 1px 5px; font-weight: 600; display: none; }
-    .jump-header { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--color-text-tertiary); padding: 4px 14px 8px; }
-    .jump-item { cursor: pointer; line-height: 1.45; }
-    .jump-item:hover { color: var(--color-text-primary); }
-    .jump-h1 { font-size: 12px; padding: 4px 14px; color: var(--color-text-secondary); }
-    .jump-h2 { font-size: 11px; padding: 4px 22px; color: var(--color-text-tertiary); }
-    .jump-h3 { font-size: 10.5px; padding: 4px 30px; color: var(--color-text-tertiary); }
-    .doc-label { font-size: 12px; color: var(--color-text-secondary); padding: 6px 14px; cursor: pointer; border-left: 2px solid transparent; }
-    .doc-label:hover { color: var(--color-text-primary); }
-    .doc-label.active { color: var(--color-text-info); background: var(--color-background-info); border-left-color: #378ADD; font-weight: 500; }
-    .toolbar { position: fixed; top: 0; left: 270px; right: 0; height: 44px; z-index: 100; background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 20px; gap: 10px; }
+    .jump-header { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--color-text-tertiary); padding: 6px 18px 10px; }
+    .jump-item { cursor: pointer; line-height: 1.45; border-radius: 8px; margin: 1px 10px; }
+    .jump-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,0.38); }
+    .jump-item.active { background: #e7f1fb; color: var(--color-text-info); }
+    .jump-h1 { font-size: 12.5px; padding: 6px 10px; color: var(--color-text-secondary); font-weight: 500; }
+    .jump-h2 { font-size: 11.5px; padding: 5px 18px; color: var(--color-text-tertiary); }
+    .jump-h3 { font-size: 11px; padding: 5px 28px; color: var(--color-text-tertiary); }
+    .jump-item.active.jump-h1,
+    .jump-item.active.jump-h2,
+    .jump-item.active.jump-h3 { color: var(--color-text-info); font-weight: 600; }
+    .jump-doc-divider { margin: 10px 18px 6px; padding-top: 10px; border-top: 0.5px solid rgba(0,0,0,0.06); font-size: 10px; color: var(--color-text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; }
+    .doc-label { font-size: 13px; color: var(--color-text-secondary); padding: 10px 16px 10px 18px; cursor: pointer; border-left: 3px solid transparent; line-height: 1.35; white-space: normal; word-break: break-word; }
+    .doc-label:hover { color: var(--color-text-primary); background: rgba(255,255,255,0.38); }
+    .doc-label.active { color: var(--color-text-info); background: #e7f1fb; border-left-color: #378ADD; font-weight: 600; }
+    .toolbar { position: fixed; top: 0; left: 320px; right: 0; height: 48px; z-index: 100; background: rgba(253,252,248,0.92); backdrop-filter: blur(8px); border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 24px; gap: 10px; }
     .toolbar-filename { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-tertiary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .annotation-pill { font-size: 11px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 20px; padding: 3px 10px; color: var(--color-text-secondary); white-space: nowrap; }
     .toolbar button, .toolbar .fallback-button { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 11px; font-weight: 500; padding: 5px 12px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-secondary); white-space: nowrap; }
     .toolbar button:disabled { opacity: 0.7; cursor: wait; }
-    .firefox-notice { position: fixed; top: 44px; left: 270px; right: 0; height: 28px; background: var(--color-background-warning); font-size: 11px; padding: 0 20px; display: none; align-items: center; color: var(--color-text-warning); z-index: 90; }
-    .content-area { margin-left: 270px; padding-top: 44px; padding-bottom: 26px; height: 100vh; overflow-y: auto; box-sizing: border-box; }
-    .content-inner { max-width: 920px; margin: 0 auto; padding: 40px 48px 120px; }
+    .firefox-notice { position: fixed; top: 48px; left: 320px; right: 0; height: 28px; background: var(--color-background-warning); font-size: 11px; padding: 0 20px; display: none; align-items: center; color: var(--color-text-warning); z-index: 90; }
+    .content-area { margin-left: 320px; padding-top: 48px; padding-bottom: 26px; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+    .content-inner { max-width: 980px; margin: 0 auto; padding: 44px 56px 120px; }
     .empty-state { padding: 48px 0; color: var(--color-text-secondary); font-size: 14px; line-height: 1.7; }
-    .status-bar { position: fixed; bottom: 0; left: 270px; right: 0; height: 26px; background: var(--color-background-secondary); border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 16px; gap: 16px; font-size: 10px; color: var(--color-text-tertiary); }
+    .status-bar { position: fixed; bottom: 0; left: 320px; right: 0; height: 26px; background: var(--color-background-secondary); border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 16px; gap: 16px; font-size: 10px; color: var(--color-text-tertiary); }
     .status-left { display: flex; align-items: center; }
     .status-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 5px; background: #BA7517; }
     .status-right { margin-left: auto; }
@@ -84,10 +90,11 @@
     .modal-actions button { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 11px; font-weight: 500; padding: 5px 12px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-secondary); }
     .modal-actions .primary { background: var(--color-background-info); color: var(--color-text-info); border-color: #378ADD; }
     .md-body { font-family: var(--font-serif); font-size: calc(15px * var(--font-scale, 1)); line-height: 1.75; color: var(--color-text-primary); }
-    .md-body h1 { font-family: var(--font-sans); font-size: 22px; font-weight: 500; margin: 0 0 12px; }
-    .md-body h2 { font-family: var(--font-sans); font-size: 16px; font-weight: 500; border-top: 0.5px solid var(--color-border-tertiary); padding-top: 10px; margin: 24px 0 10px; }
-    .md-body h3 { font-family: var(--font-sans); font-size: 14px; font-weight: 500; margin: 18px 0 8px; }
+    .md-body h1 { font-family: var(--font-sans); font-size: 23px; font-weight: 600; margin: 0 0 14px; }
+    .md-body h2 { font-family: var(--font-sans); font-size: 17px; font-weight: 600; border-top: 0.5px solid var(--color-border-tertiary); padding-top: 12px; margin: 28px 0 12px; }
+    .md-body h3 { font-family: var(--font-sans); font-size: 14.5px; font-weight: 600; margin: 20px 0 9px; }
     .md-body p { margin-bottom: 1em; }
+    .md-body p.doc-meta { font-family: var(--font-sans); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-tertiary); line-height: 1.8; margin: 0 0 20px; }
     .md-body strong { font-weight: 500; }
     .md-body em { font-style: italic; }
     .md-body a { color: var(--color-text-info); }
@@ -141,9 +148,10 @@
     <aside class="sidebar">
       <div class="sidebar-header"><div id="projectTitle" class="sidebar-project"></div><div id="projectSubtitle" class="sidebar-subtitle"></div></div>
       <div class="reviewer-badge"><span id="reviewerName"></span><span id="switchReviewer" class="reviewer-switch">Not you?</span></div>
-      <div class="jump-header">Current doc</div>
+      <div class="jump-header">Paper outline</div>
+      <div id="outlineGroupName" class="group-context"></div>
       <div id="jumpItems" class="outline-panel"></div>
-      <div class="doc-switcher"><div class="jump-header">Docs in this group</div><div id="navTree"></div></div>
+      <div class="doc-switcher"><div class="jump-header">All documents</div><div id="navTree"></div></div>
     </aside>
     <div class="toolbar"><div id="filenameBar" class="toolbar-filename">No file selected</div><div id="annotationPill" class="annotation-pill">0 annotations</div><button id="fontDownBtn" type="button" title="Decrease font size">A-</button><button id="fontResetBtn" type="button" title="Reset font size">A</button><button id="fontUpBtn" type="button" title="Increase font size">A+</button><div id="saveControls"><button id="saveBtn" type="button">Save</button></div></div>
     <div id="firefoxNotice" class="firefox-notice"></div>
@@ -171,6 +179,7 @@
     const projectSubtitle = document.getElementById('projectSubtitle');
     const reviewerName = document.getElementById('reviewerName');
     const switchReviewer = document.getElementById('switchReviewer');
+    const outlineGroupName = document.getElementById('outlineGroupName');
     const navTree = document.getElementById('navTree');
     const jumpItems = document.getElementById('jumpItems');
     const filenameBar = document.getElementById('filenameBar');
@@ -205,6 +214,7 @@
     let modalKind = null;
     let saveBtn = null;
     let fontScale = Number(localStorage.getItem('markuphub_font_scale') || '1');
+    let activeHeadingKey = null;
 
     projectTitle.textContent = DOCS_DATA.project || 'markup-hub';
     projectSubtitle.textContent = DOCS_DATA.subtitle || '';
@@ -271,6 +281,37 @@
       return leaf.replace(/\.md$/i, '').replace(/_/g, ' ');
     }
 
+    function normalizeHeadingText(value) {
+      return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function headingKey(filePath, headingText) {
+      return filePath + '::' + normalizeHeadingText(headingText);
+    }
+
+    function currentGroupName() {
+      if (!currentFile) { return ''; }
+      for (const [groupName, files] of Object.entries(DOCS_DATA.groups || {})) {
+        if ((files || []).includes(currentFile)) { return groupName; }
+      }
+      return '';
+    }
+
+    function filesForGroup(groupName) {
+      return (DOCS_DATA.groups && DOCS_DATA.groups[groupName]) ? DOCS_DATA.groups[groupName] : [];
+    }
+
+    function extractHeadingsForFile(filePath) {
+      const raw = DOCS_DATA.files && DOCS_DATA.files[filePath] ? DOCS_DATA.files[filePath] : '';
+      const headings = [];
+      raw.split(/\r?\n/).forEach((line) => {
+        const match = line.match(/^(#{1,3})\s+(.*)$/);
+        if (!match) { return; }
+        headings.push({ level: match[1].length, text: normalizeHeadingText(match[2]), file: filePath });
+      });
+      return headings;
+    }
+
     function navFiles() {
       const files = [];
       Object.values(DOCS_DATA.groups || {}).forEach((entries) => (entries || []).forEach((file) => files.push(file)));
@@ -281,9 +322,10 @@
       const currentCount = currentFile ? annotations.filter((item) => item.filename === currentFile).length : 0;
       annotationPill.textContent = currentCount + (currentCount === 1 ? ' annotation' : ' annotations');
       document.querySelectorAll('.doc-label').forEach((item) => {
-        const file = item.dataset.file;
-        const count = annotations.filter((annotation) => annotation.filename === file).length;
-        item.textContent = extractLabel(file) + (count > 0 ? ' (' + count + ')' : '');
+        const groupName = item.dataset.group;
+        const files = filesForGroup(groupName);
+        const count = annotations.filter((annotation) => files.includes(annotation.filename)).length;
+        item.textContent = groupName + (count > 0 ? ' (' + count + ')' : '');
       });
       const filesWithAnnotations = new Set(annotations.map((item) => item.filename)).size;
       statusSummary.textContent = annotations.length + ' annotations - ' + filesWithAnnotations + ' files';
@@ -298,18 +340,15 @@
     function buildNav() {
       navTree.innerHTML = '';
       Object.entries(DOCS_DATA.groups || {}).forEach(([groupName, files]) => {
-        const label = document.createElement('div');
-        label.className = 'group-label';
-        label.textContent = groupName;
-        navTree.appendChild(label);
-        (files || []).forEach((file) => {
-          const item = document.createElement('div');
-          item.className = 'doc-label';
-          item.dataset.file = file;
-          item.textContent = extractLabel(file);
-          item.addEventListener('click', () => loadDocument(file));
-          navTree.appendChild(item);
+        const item = document.createElement('div');
+        item.className = 'doc-label';
+        item.dataset.group = groupName;
+        item.textContent = groupName;
+        item.addEventListener('click', () => {
+          const firstFile = (files || [])[0];
+          if (firstFile) { loadDocument(firstFile); }
         });
+        navTree.appendChild(item);
       });
       updateCounts();
     }
@@ -374,23 +413,69 @@
       });
     }
 
+    function updateOutlineActive() {
+      document.querySelectorAll('.jump-item[data-heading-key]').forEach((item) => {
+        item.classList.toggle('active', item.dataset.headingKey === activeHeadingKey);
+      });
+      const activeItem = document.querySelector('.jump-item.active');
+      if (activeItem && activeItem.scrollIntoView) {
+        activeItem.scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    function syncActiveHeading() {
+      if (!currentFile) { return; }
+      const headings = Array.from(content.querySelectorAll('h1, h2, h3'));
+      if (!headings.length) { return; }
+      let active = headings[0];
+      const threshold = 120;
+      headings.forEach((heading) => {
+        if (heading.offsetTop - contentArea.scrollTop <= threshold) {
+          active = heading;
+        }
+      });
+      activeHeadingKey = active.dataset.headingKey || headingKey(currentFile, active.textContent.trim());
+      updateOutlineActive();
+    }
+
     function buildJumpPanel() {
-      jumpItems.innerHTML = '';
-      const headings = content.querySelectorAll('h1, h2, h3');
-      if (!headings.length) {
+        jumpItems.innerHTML = '';
+      const groupName = currentGroupName();
+      outlineGroupName.textContent = groupName || 'No active paper';
+      const groupFiles = filesForGroup(groupName);
+      if (!groupFiles.length) {
         const empty = document.createElement('div');
         empty.className = 'jump-item jump-h2';
-        empty.textContent = 'No sections in this file';
+        empty.textContent = 'No sections in this paper';
         jumpItems.appendChild(empty);
         return;
       }
-      headings.forEach((heading) => {
-        const item = document.createElement('div');
-        item.className = 'jump-item jump-' + heading.tagName.toLowerCase();
-        item.textContent = heading.textContent.trim();
-        item.addEventListener('click', () => heading.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-        jumpItems.appendChild(item);
+      groupFiles.forEach((filePath, fileIndex) => {
+        const headings = extractHeadingsForFile(filePath);
+        if (!headings.length) {
+          const divider = document.createElement('div');
+          divider.className = 'jump-doc-divider';
+          divider.textContent = extractLabel(filePath);
+          jumpItems.appendChild(divider);
+          return;
+        }
+        if (fileIndex > 0) {
+          const divider = document.createElement('div');
+          divider.className = 'jump-doc-divider';
+          divider.textContent = extractLabel(filePath);
+          jumpItems.appendChild(divider);
+        }
+        headings.forEach((heading) => {
+          const item = document.createElement('div');
+          item.className = 'jump-item jump-h' + Math.min(heading.level, 3);
+          item.textContent = heading.text;
+          item.dataset.file = filePath;
+          item.dataset.headingKey = headingKey(filePath, heading.text);
+          item.addEventListener('click', () => loadDocument(filePath, heading.text));
+          jumpItems.appendChild(item);
+        });
       });
+      updateOutlineActive();
     }
 
     function stashMath(rawMarkdown) {
@@ -415,23 +500,56 @@
       });
     }
 
-    function loadDocument(file) {
+    function styleMetadataParagraphs() {
+      const metadataPattern = /George Mason University\s+\|\s+\d{4}-\d{2}-\d{2}/;
+      content.querySelectorAll('p').forEach((paragraph) => {
+        const text = paragraph.textContent.replace(/\s+/g, ' ').trim();
+        if (metadataPattern.test(text)) {
+          paragraph.classList.add('doc-meta');
+        }
+      });
+    }
+
+    function assignHeadingKeys() {
+      content.querySelectorAll('h1, h2, h3').forEach((heading) => {
+        heading.dataset.headingKey = headingKey(currentFile, heading.textContent.trim());
+      });
+    }
+
+    function scrollToHeading(headingText) {
+      if (!headingText) { return; }
+      const normalizedTarget = normalizeHeadingText(headingText);
+      const heading = Array.from(content.querySelectorAll('h1, h2, h3')).find((item) => normalizeHeadingText(item.textContent) === normalizedTarget);
+      if (heading) {
+        heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        activeHeadingKey = heading.dataset.headingKey || headingKey(currentFile, heading.textContent.trim());
+        updateOutlineActive();
+      }
+    }
+
+    function loadDocument(file, focusHeadingText) {
       currentFile = file;
-      document.querySelectorAll('.doc-label').forEach((item) => item.classList.toggle('active', item.dataset.file === file));
+      const groupName = currentGroupName();
+      document.querySelectorAll('.doc-label').forEach((item) => item.classList.toggle('active', item.dataset.group === groupName));
       filenameBar.textContent = file;
       const rawMarkdown = DOCS_DATA.files && DOCS_DATA.files[file] ? DOCS_DATA.files[file] : '';
       const math = stashMath(rawMarkdown);
       content.innerHTML = restoreMath(marked.parse(math.text), math.stash);
       wrapTables();
+      styleMetadataParagraphs();
       if (window.MathJax && window.MathJax.typesetPromise) {
         if (window.MathJax.typesetClear) { window.MathJax.typesetClear([content]); }
         window.MathJax.typesetPromise([content]).catch(() => {});
       }
+      assignHeadingKeys();
       assignParagraphIndices();
       rawBlocks = rawMarkdown ? rawMarkdown.split(/\n\n+/) : [];
       reinjectAnnotations(currentFile);
       buildJumpPanel();
       contentArea.scrollTo({ top: 0, behavior: 'auto' });
+      activeHeadingKey = null;
+      syncActiveHeading();
+      if (focusHeadingText) { setTimeout(() => scrollToHeading(focusHeadingText), 0); }
       updateCounts();
       hidePopup();
     }
@@ -626,6 +744,7 @@
       popupEditBtn.addEventListener('click', () => openModal('edit'));
       modalCancelBtn.addEventListener('click', () => { pendingSelection = null; closeModal(); });
       modalSubmitBtn.addEventListener('click', () => createAnnotation(modalKind));
+      contentArea.addEventListener('scroll', syncActiveHeading);
       document.addEventListener('mousedown', (event) => { if (selectionPopup.style.display === 'flex' && !selectionPopup.contains(event.target)) { hidePopup(); } if (modalOverlay.style.display === 'flex' && event.target === modalOverlay) { pendingSelection = null; closeModal(); } });
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') { hidePopup(); pendingSelection = null; closeModal(); }

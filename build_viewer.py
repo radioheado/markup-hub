@@ -3,11 +3,14 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from core.config import load_config
 from core.manifests import collect_group_sources, read_text
 from core.numbering import number_group
+
+BUILD_DATE_TOKEN = "{{build_date}}"
 
 
 def emit(text: str) -> None:
@@ -25,6 +28,10 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def apply_dynamic_placeholders(text: str, build_date: str) -> str:
+    return text.replace(BUILD_DATE_TOKEN, build_date)
+
+
 def main() -> int:
     args = parse_args()
     hub_dir = Path(__file__).resolve().parent
@@ -36,6 +43,7 @@ def main() -> int:
 
     labels_cfg = {str(key).replace('\\', '/'): value for key, value in config.get('labels', {}).items()}
     groups_cfg = config.get('groups', {})
+    build_date = datetime.now().astimezone().date().isoformat()
     groups: dict[str, list[str]] = {}
     labels: dict[str, str] = {}
     files: dict[str, str] = {}
@@ -64,7 +72,7 @@ def main() -> int:
 
         processed_group_files = number_group(file_list, raw_group_files)
         for rel_path in file_list:
-            processed = processed_group_files[rel_path]
+            processed = apply_dynamic_placeholders(processed_group_files[rel_path], build_date)
             files[rel_path] = processed
             total_chars += len(processed)
         groups[group_name] = file_list
