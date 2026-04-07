@@ -6,8 +6,17 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 import re
+import sys
 
 BLOCK_SPLIT_RE = re.compile(r'\n\n+')
+
+
+def emit(text: str) -> None:
+    stream = getattr(sys.stdout, 'buffer', None)
+    if stream is not None:
+        stream.write((text + '\n').encode('utf-8', errors='replace'))
+    else:
+        print(text)
 
 
 def parse_args() -> argparse.Namespace:
@@ -58,7 +67,7 @@ def main() -> int:
     hub_dir = Path(args.hub).resolve()
     reviews_path = hub_dir / 'reviews.json'
     if not reviews_path.exists():
-        print(f'reviews.json not found in {hub_dir}')
+        emit(f'reviews.json not found in {hub_dir}')
         return 1
 
     data = json.loads(reviews_path.read_text(encoding='utf-8'))
@@ -78,7 +87,7 @@ def main() -> int:
         if not resolved.exists():
             missing_files.append(filename)
             skipped += len(file_annotations)
-            print(f'Warning: target file missing: {resolved}')
+            emit(f'Warning: target file missing: {resolved}')
             continue
 
         original = resolved.read_text(encoding='utf-8', errors='replace')
@@ -93,8 +102,8 @@ def main() -> int:
 
         updated = '\n\n'.join(blocks)
         if args.dry_run:
-            print(f'--- {resolved} ---')
-            print(updated)
+            emit(f'--- {resolved} ---')
+            emit(updated)
             continue
 
         if not args.no_backup:
@@ -102,15 +111,15 @@ def main() -> int:
             backup_path.write_text(original, encoding='utf-8')
         resolved.write_text(updated, encoding='utf-8')
 
-    print(f'Applied: {applied} annotations across {len(grouped) - len(missing_files)} files')
-    print(f'Skipped: {skipped} annotations (files not found: {missing_files})')
-    print('')
-    print('Next steps:')
-    print('  1. Open modified .md files in VSCode')
-    print('  2. Search for <!-- REVIEW or <!-- EDIT-SUGGESTION')
-    print('  3. Review each annotation, apply edits manually if accepted')
-    print('  4. Delete the comment blocks when done')
-    print('  5. Run build_viewer.py to refresh the viewer')
+    emit(f'Applied: {applied} annotations across {len(grouped) - len(missing_files)} files')
+    emit(f'Skipped: {skipped} annotations (files not found: {missing_files})')
+    emit('')
+    emit('Next steps:')
+    emit('  1. Open modified .md files in VSCode')
+    emit('  2. Search for <!-- REVIEW or <!-- EDIT-SUGGESTION')
+    emit('  3. Review each annotation, apply edits manually if accepted')
+    emit('  4. Delete the comment blocks when done')
+    emit('  5. Run build_viewer.py to refresh the viewer')
     return 0
 
 

@@ -6,10 +6,11 @@ from pathlib import Path
 
 INCLUDE_RE = re.compile(r"<!-- INCLUDE (.+?) -->")
 HEADING_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
+BOM = "\ufeff"
 
 
 def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="replace")
+    return path.read_text(encoding="utf-8")
 
 
 def to_hub_relative(path: Path, hub_dir: Path) -> str:
@@ -20,7 +21,7 @@ def extract_label(file_path: Path, content: str, labels: dict[str, str], hub_dir
     rel_path = to_hub_relative(file_path, hub_dir)
     if rel_path in labels:
         return labels[rel_path]
-    match = HEADING_RE.search(content)
+    match = HEADING_RE.search(content.lstrip(BOM))
     if match:
         return match.group(1).strip()
     return file_path.stem.replace("_", " ")

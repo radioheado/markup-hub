@@ -59,6 +59,9 @@ def main() -> int:
             emit(f'Warning: main manifest missing for {group_name}: {main_path}')
             groups[group_name] = []
             continue
+        except UnicodeDecodeError as exc:
+            emit(f'Error: non-UTF-8 file in {group_name}: {main_path} ({exc})')
+            return 1
 
         file_list, raw_group_files, group_labels = collect_group_sources(
             hub_dir,
@@ -86,7 +89,11 @@ def main() -> int:
         'files': files,
     }
 
-    template = read_text(template_path)
+    try:
+        template = read_text(template_path)
+    except UnicodeDecodeError as exc:
+        emit(f'Error: non-UTF-8 template file: {template_path} ({exc})')
+        return 1
     html = template.replace('__DOCS_DATA__', json.dumps(docs_data, ensure_ascii=False, separators=(',', ':')), 1)
     out_path.write_text(html, encoding='utf-8')
 

@@ -4,6 +4,7 @@ import re
 
 PLACEHOLDER_RE = re.compile(r"\{\{(tbl|fig|sec):([A-Za-z0-9_\-]+)\}\}")
 SPECIAL_CHAR_RE = re.compile(r"[^a-z0-9_\s]")
+BOM = "\ufeff"
 
 
 def normalize_section_label(text: str) -> str:
@@ -34,7 +35,8 @@ def number_group(
         lines = original.splitlines()
         out_lines: list[str] = []
         for line in lines:
-            heading_match = re.match(r"^(#{1,6})\s+(.*)$", line)
+            normalized_line = line.lstrip(BOM)
+            heading_match = re.match(r"^(#{1,6})\s+(.*)$", normalized_line)
             if heading_match:
                 level = len(heading_match.group(1))
                 title = heading_match.group(2).strip()
