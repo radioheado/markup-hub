@@ -1,6 +1,6 @@
 # Local workspace configuration
 collab_config.toml
-reviews.json
+reviews/
 
 # Generated viewer outputs
 collab_viewer.html
