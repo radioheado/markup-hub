@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -11,6 +13,7 @@ from core.manifests import collect_group_sources, read_text
 from core.numbering import number_group
 
 BUILD_DATE_TOKEN = "{{build_date}}"
+IMAGE_LINK_RE = re.compile(r'!\[([^\]]*)\]\(([^)]+)\)')
 
 
 def emit(text: str) -> None:
@@ -32,6 +35,24 @@ def apply_dynamic_placeholders(text: str, build_date: str) -> str:
     return text.replace(BUILD_DATE_TOKEN, build_date)
 
 
+def rewrite_image_links(text: str, rel_path: str, viewer_root: Path, hub_dir: Path) -> str:
+    source_path = (hub_dir / rel_path).resolve()
+
+    def replace(match: re.Match) -> str:
+        alt_text = match.group(1)
+        target = match.group(2).strip()
+        if re.match(r'^([a-z][a-z0-9+.-]*:|/|#)', target, re.I):
+            return match.group(0)
+        asset_path = (source_path.parent / target).resolve()
+        try:
+            normalized = os.path.relpath(asset_path, viewer_root).replace('\\', '/')
+        except ValueError:
+            return match.group(0)
+        return f'![{alt_text}]({normalized})'
+
+    return IMAGE_LINK_RE.sub(replace, text)
+
+
 def main() -> int:
     args = parse_args()
     hub_dir = Path(__file__).resolve().parent
@@ -48,6 +69,8 @@ def main() -> int:
     labels: dict[str, str] = {}
     files: dict[str, str] = {}
     total_chars = 0
+
+    viewer_root = out_path.parent
 
     for group_name, group_data in groups_cfg.items():
         if not group_data.get('enabled', True):
@@ -76,6 +99,7 @@ def main() -> int:
         processed_group_files = number_group(file_list, raw_group_files)
         for rel_path in file_list:
             processed = apply_dynamic_placeholders(processed_group_files[rel_path], build_date)
+            processed = rewrite_image_links(processed, rel_path, viewer_root, hub_dir)
             files[rel_path] = processed
             total_chars += len(processed)
         groups[group_name] = file_list
